@@ -130,7 +130,7 @@ uint32_t WizFi250_Socket::send (const String &buf)
 	uint8_t temp_ip[16] = {0};
 
 	if( !m_bIsConnected || buf == NULL )
-		return 1;
+		return RET_NOK;
 
 	memset(tmpstr, 0, 32);
 	strcpy_P((char *)tmpstr, (char*)pgm_read_word(&(at_cmd_table[AT_SSEND]))); 	// Necessary casts and dereferencing, just copy.
@@ -140,7 +140,7 @@ uint32_t WizFi250_Socket::send (const String &buf)
 	m_wizfi250->write((uint8_t*)cmd);
 	m_wizfi250->write(buf);
 
-	return 0;
+	return RET_OK;
 }
 
 uint32_t WizFi250_Socket::send (const uint8_t *buf)
@@ -159,7 +159,7 @@ uint32_t WizFi250_Socket::send (const uint8_t *buf, size_t size)
 	uint8_t temp_ip[16] = {0};
 
 	if( !m_bIsConnected || buf == NULL )
-		return 1;
+		return RET_NOK;
 
 	sprintf((char*)temp_ip,"%d.%d.%d.%d", (uint8_t)m_dest_ip[0], (uint8_t)m_dest_ip[1], (uint8_t)m_dest_ip[2], (uint8_t)m_dest_ip[3] );
 	sprintf((char*)cmd, "AT+SSEND=%c,%s,%d,%d\r", m_cid, temp_ip, (int)m_dest_port, (int)size);
@@ -168,7 +168,7 @@ uint32_t WizFi250_Socket::send (const uint8_t *buf, size_t size)
 	m_wizfi250->write((uint8_t*)buf, size);
 
 
-	return 0;
+	return RET_OK;
 }
 
 //int WizFi250_Socket::recv (uint8_t *buf)

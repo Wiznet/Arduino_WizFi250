@@ -159,13 +159,19 @@ uint8_t WizFi250::sendATCommand (const char *send_command, uint8_t command_idx, 
 			{
 				m_Current_CmdState = WizFi250_CmdState_IDLE;
 				m_Current_ReplyState = WizFi250_ReplyState_IDLE;
-				return 0;
+				return RET_OK;
+			}
+			else if(m_CmdResult == CMD_NOTI)
+			{
+				m_Current_CmdState = WizFi250_CmdState_IDLE;
+				m_Current_ReplyState = WizFi250_ReplyState_IDLE;
+				return RET_NOTI;
 			}
 			else if(m_CmdResult == CMD_FAILED)
 			{
 				m_Current_CmdState = WizFi250_CmdState_IDLE;
 				m_Current_ReplyState = WizFi250_ReplyState_IDLE;
-				return 2;
+				return RET_NOK;
 			}
 		}
 	}
@@ -173,14 +179,14 @@ uint8_t WizFi250::sendATCommand (const char *send_command, uint8_t command_idx, 
 
 uint8_t WizFi250::sendATCommand(const char *send_command, uint8_t cr_lf, uint32_t check_delay, uint32_t check_count, char* str_find1, char* str_find2 )
 {
-	uint8_t nResult = 0;
+	uint8_t nResult = RET_OK;
 
 	nResult = sendCommand(send_command, cr_lf, m_spi_debug_level);
-	if( nResult != SPI_SUCCESS )
+	if( nResult != RET_OK )
 		return nResult;
 
 	nResult = waitResponseCmd(check_delay, check_count, str_find1, str_find2, m_spi_debug_level);
-	if( nResult != SPI_SUCCESS )
+	if( nResult != RET_OK )
 		return nResult;
 }
 
@@ -237,8 +243,11 @@ void WizFi250::RcvPacket(void)
 									Serial.print((char const*)DBG_Buf);
 									Serial.print((char *)m_ReplyBuf);
 								}
-								ParseNotify(m_ReplyBuf);
+								retval = ParseNotify(m_ReplyBuf);
 								memset(m_ReplyBuf, 0, MAX_DATA_BUFSIZE);
+
+								if(retval == RET_OK)
+									m_CmdResult = CMD_NOTI;
 							}
 							else
 							{
@@ -258,9 +267,9 @@ void WizFi250::RcvPacket(void)
 								memset(m_ReplyBuf, 0, MAX_SPI_BUFSIZE);
 								m_RxIdx = 0;
 
-								if(retval == 1)
+								if(retval == CMD_SUCCEEDED)
 									m_CmdResult = CMD_SUCCEEDED;
-								else if(retval == 2)
+								else if(retval == CMD_FAILED)
 									m_CmdResult = CMD_FAILED;
 
 								m_Current_ESC_State = WizFi250_ESC_IDLE;
@@ -482,7 +491,7 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 #ifdef DEBUG_ENABLE
 				Serial.println("-1");
 #endif
-				return 0;
+				return CMD_FAILED;
 			}
 #ifdef DEBUG_ENABLE
 			//Serial.println((char*)Token);
@@ -511,7 +520,9 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 					m_Current_ReplyState = WizFi250_ReplyState_CONNECT;
 				}
 				else if( !strcmp((char const *)Token, "[ERROR]") || !strcmp((char const *)Token, "[DISCONNECT") )
+				{
 					return CMD_FAILED;
+				}
 				else
 					return CMD_CONTINUE;		// If
 
@@ -530,51 +541,6 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 			retval = GetToken(buf, Token);
 		}
 		break;
-
-//				if(m_ReplyMsgCnt >= 2)
-//				{
-//					m_ReplyMsgCnt = 0;
-//					return CMD_SUCCEEDED;
-//				}
-//
-//				if( !strcmp((char const *)Token, "[OK]") )
-//				{
-//					m_ReplyMsgCnt++;
-//					return CMD_CONTINUE;
-//				}
-//				else if( !strcmp((char const *)Token, "[ERROR]") )
-//					return CMD_FAILED;
-//				else if( !strcmp((char const *)Token, "[CONNECT") )
-//				{
-//					m_ReplyMsgCnt++;
-//					m_Current_ReplyState = WizFi250_ReplyState_CONNECT;
-//				}
-//				break;
-//
-//			case WizFi250_ReplyState_CONNECT:
-//				if(Token[0] >= '0' && Token[0] <= '9')
-//				{
-//					m_cid = (char)Token[0];
-//					m_Current_ReplyState = WizFi250_ReplyState_IDLE;
-//				}
-//				else if( !strcmp((char const *)Token, "[OK]") )
-//				{
-//					m_ReplyMsgCnt = 0;
-//					return CMD_SUCCEEDED;
-//				}
-//				else if( !strcmp((char const *)Token, "[ERROR]") )
-//				{
-//					m_ReplyMsgCnt = 0;
-//					return CMD_FAILED;
-//				}
-//				else
-//					return CMD_SENT;
-//				break;
-//			}
-//
-//			retval = GetToken(buf, Token);
-//		}
-//		break;
 
 	case AT_FDNS:
 		m_Current_Ptr = 0;
@@ -630,14 +596,14 @@ uint8_t WizFi250::ParseNotify(uint8_t *buf)
 #endif
 		if(retval == -1)
 		{
-			return -1;
+			return RET_NOK;
 		}else
 		{
 			if(Token[0] >= '0' && Token[0] <= '9')
 				m_NOTI_CH = Token[0];
 
 			m_NOTI_TYPE = DISCONNECT_NOTI;
-			return 1;
+			return RET_OK;
 		}
 	}
 
@@ -648,7 +614,7 @@ uint8_t WizFi250::ParseNotify(uint8_t *buf)
 	{
 		retval = GetToken(buf, Token);
 		if(retval == -1)
-			return -1;
+			return RET_NOK;
 #ifdef DEBUG_ENABLE
 		Serial.println((char *)Token);
 #endif
@@ -664,11 +630,11 @@ uint8_t WizFi250::ParseNotify(uint8_t *buf)
 			if(Token[1] == ']')
 			{
 				m_NOTI_TYPE = CONNECT_NOTI;
-				return 1;
+				return RET_OK;
 			}
 		}
 		else
-			return -1;
+			return RET_NOK;
 
 //		m_NOTI_TYPE = CONNECT_NOTI;
 //
@@ -683,7 +649,7 @@ uint8_t WizFi250::ParseNotify(uint8_t *buf)
 	{
 		m_NOTI_TYPE = SOCKFAILURE_NOTI;
 
-		return 1;
+		return RET_OK;
 	}
 
 	memset(tmpstr, 0, 16);
@@ -692,7 +658,7 @@ uint8_t WizFi250::ParseNotify(uint8_t *buf)
 	if(!strcmp((char const*)Token, (const char *)tmpstr))
 	{
 		m_NOTI_TYPE = NO_NOTI;
-		return 1;
+		return RET_OK;
 	}
 
 	memset(tmpstr, 0, 16);
@@ -707,7 +673,7 @@ uint8_t WizFi250::ParseNotify(uint8_t *buf)
 		strcpy_P((char *)tmpstr, (char*)pgm_read_word(&(debug_receiving_data_table[DBG_DISASSOCIATE_MSG]))); // Necessary casts and dereferencing, just copy.
 		Serial.println((char*)tmpstr);
 
-		return 1;
+		return RET_OK;
 	}
 
 	memset(tmpstr, 0, 16);
@@ -716,12 +682,12 @@ uint8_t WizFi250::ParseNotify(uint8_t *buf)
 	if(!strcmp((char const*)Token, (const char *)final_str))
 	{
 		m_NOTI_TYPE = NO_NOTI;
-		return 1;
+		return RET_OK;
 	}
 
 	m_NOTI_TYPE = INVALID_NOTI;
 
-	return 1;
+	return RET_OK;
 }
 
 int WizFi250::GetToken(uint8_t * buf, uint8_t * Token)
@@ -790,13 +756,13 @@ uint8_t WizFi250::sync()
 	uint8_t nResult = 0;
 
 	nResult = sendATCommand((char*)"AT", 1, 50, 100, (char*)"[OK]", (char*)"");
-	if(nResult != 0)
+	if(nResult != RET_OK)
 	{
 		return nResult;
 	}
 
 	nResult = sendATCommand((char*)"AT+MECHO=0", 1, 50, 100, (char*)"[OK]",(char*)"");
-	if(nResult != 0)
+	if(nResult != RET_OK)
 	{
 		return nResult;
 	}
@@ -815,7 +781,7 @@ uint8_t	WizFi250::setDhcp(void)
 	sprintf((char*)cmd, (char*)tmpstr);
 
 	nResult = sendATCommand((char*)cmd, AT_WNET, 1);
-	if(nResult != 0)
+	if(nResult != RET_OK)
 	{
 		return nResult;
 	}
@@ -836,7 +802,7 @@ uint8_t WizFi250::defaultWebServerDown ()
 	sprintf((char*)cmd, (char*)tmpstr);
 
 	nResult = sendATCommand((char*)cmd, AT_FWEBS_DOWN, 1);
-	if(nResult != 0)
+	if(nResult != RET_OK)
 	{
 		return nResult;
 	}
@@ -855,7 +821,7 @@ uint8_t WizFi250::defaultWebServerUp ()
 	sprintf((char*)cmd, (char*)tmpstr);
 
 	nResult = sendATCommand((char*)cmd, AT_FWEBS_UP, 1);
-	if(nResult != 0)
+	if(nResult != RET_OK)
 	{
 		return nResult;
 	}
@@ -875,7 +841,7 @@ uint8_t	WizFi250::join(const char *ssid, const char *phrase, const char *auth)
 	sprintf((char*)cmd, (char*)tmpstr, (char*)ssid);
 
 	nResult = sendATCommand((char*)cmd, AT_WSET, 1);
-	if(nResult != 0)
+	if(nResult != RET_OK)
 	{
 		return nResult;
 	}
@@ -885,7 +851,7 @@ uint8_t	WizFi250::join(const char *ssid, const char *phrase, const char *auth)
 	sprintf((char*)cmd, (char*)tmpstr, auth, phrase);
 
 	nResult = sendATCommand((char*)cmd, AT_WSEC, 1);
-	if(nResult != 0)
+	if(nResult != RET_OK)
 	{
 		return nResult;
 	}
@@ -895,7 +861,7 @@ uint8_t	WizFi250::join(const char *ssid, const char *phrase, const char *auth)
 	sprintf((char*)cmd, (char*)tmpstr);
 
 	nResult = sendATCommand((char*)cmd, AT_WJOIN, 1);
-	if(nResult != 0)
+	if(nResult != RET_OK)
 		return nResult;
 
 	return nResult;
@@ -913,7 +879,7 @@ uint8_t	WizFi250::printWirelessStatus()
 	sprintf((char*)cmd, (char*)tmpstr);
 
 	nResult = sendATCommand((char*)cmd, AT_WSTAT, 1);
-	if(nResult != 0)
+	if(nResult != RET_OK)
 	{
 		//if(m_debug_print >=1 )	{ DBG("DBG>>> Error :"); DBG_LN("AT+WSTAT"); }
 		return nResult;

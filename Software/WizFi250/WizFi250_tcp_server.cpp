@@ -28,14 +28,14 @@ uint8_t WizFi250_TCP_Server::listen	()
 
 		retval = m_wizfi250->sendATCommand((char*)cmd, AT_SCON_TCP_SERVER, 1);
 
-		if(retval == 0)
+		if(retval == RET_OK)
 		{
 			m_isListen = true;
 //			m_cid = m_wizfi250->m_cid;
 
 			return 1;
 		}
-		else if ( retval == 2 )
+		else if ( retval == RET_NOK )
 			return 0;
 	}
 }
@@ -63,14 +63,14 @@ uint8_t WizFi250_TCP_Server::stop()
 
 		retval = m_wizfi250->sendATCommand((char*)cmd, 1, 50, 100, (char*)"[DISCONNECT",(char*)"");
 
-		if(retval == 0)
+		if(retval == RET_OK)
 		{
 			m_isListen = false;
 			m_cid = 0xff;
 			m_bIsConnected = false;
 			return 1;
 		}
-		else if ( retval == 2 )
+		else if ( retval == RET_NOK )
 			return 0;
 	}
 }

@@ -1,5 +1,6 @@
 #include "Debug.h"
 #include "WizFi250_spi_drv.h"
+#include "WizFi250_definitions.h"
 
 #include <avr/pgmspace.h>
 
@@ -406,7 +407,7 @@ void WizFi250SpiDrv::spi_senddata(uint8_t *send_data, uint32_t send_length, uint
 
 uint8_t WizFi250SpiDrv::sendCommand(const char *send_command, uint8_t cr_lf, uint8_t debug_print )
 {
-	uint8_t		nResult = 0;
+	uint8_t		nResult = RET_OK;
 	uint32_t	temp_length_spi_received = 0;
 	char crlf_string[3];
 	char temp_buff[50];
@@ -492,7 +493,7 @@ uint8_t WizFi250SpiDrv::waitResponse(uint32_t check_delay, uint32_t check_count,
 
 uint8_t WizFi250SpiDrv::waitResponseCmd(uint32_t check_delay, uint32_t check_count, char* str_find1, char* str_find2, uint8_t debug_print )
 {
-	uint8_t		nResult = 0;
+	uint8_t		nResult = SPI_SUCCESS;
 	char		temp_buff[50];
 
 	nResult = waitResponse( check_delay, check_count, str_find1, str_find2, debug_print );

@@ -64,11 +64,13 @@ uint8_t WizFi250_TCP_Client::connect()
 			sprintf(cmd, tmpstr, m_dstDomain, 1000);
 
 			retval = m_wizfi250->sendATCommand((char*)cmd, AT_FDNS, 1);
-			if(retval == 0)
+			if(retval == RET_OK)
 			{
 				strcpy((char*)temp_ip,(char*)m_wizfi250->m_peerIPAddr);
 				break;
 			}
+			else
+				return retval;	// RET_NOK or RET_NOTI
 
 		}
 	}
@@ -86,7 +88,7 @@ uint8_t WizFi250_TCP_Client::connect()
 		sprintf(cmd, tmpstr, temp_ip, m_dest_port, 0);
 
 		retval = m_wizfi250->sendATCommand((char*)cmd, AT_SCON_TCP_CLIENT, 1 );
-		if(retval == 0)
+		if(retval == RET_OK)
 		{
 			//m_bOpen = true;
 			m_bIsConnected = true;
@@ -95,11 +97,8 @@ uint8_t WizFi250_TCP_Client::connect()
 			memset(tmpstr, 0, 32);
 			strcpy_P((char *)tmpstr, (char*)pgm_read_word(&(tcp_client_dbg_msg_table[DBG_CONN]))); // Necessary casts and dereferencing, just copy.
 			sprintf(finalstr, tmpstr, m_cid);
-
-			return 1;
 		}
-		else
-			return 0;
 
+		return retval;
 	}
 }

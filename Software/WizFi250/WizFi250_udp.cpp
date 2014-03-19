@@ -31,7 +31,7 @@ uint8_t	WizFi250_UDP::begin	()
 		sprintf(cmd, tmpstr, temp_ip, m_dest_port,m_local_port, 0);
 
 		retval = m_wizfi250->sendATCommand((char*)cmd, AT_SCON_UDP, 1 );
-		if(retval == 0)
+		if(retval == RET_OK)
 		{
 			m_bIsConnected = true;
 			m_cid = m_wizfi250->m_cid;

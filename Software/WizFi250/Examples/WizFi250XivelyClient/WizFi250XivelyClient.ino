@@ -4,7 +4,6 @@
 #include "WizFi250.h"
 #include "WizFi250_tcp_client.h"
 
-
 #define APIKEY		"EUHFMSwZj8pDdE6jKZgooDt3vlDivDy6srpKgbfE0rgdnZ3D"
 #define FEEDID		"827175846"
 #define USERAGENT	""
@@ -97,7 +96,7 @@ void sendData(String thisData)
 	uint8_t content_len[6]={0};
 	String TxData;
 
-	if(myClient.connect())
+	if(myClient.connect() == RET_OK)
 	{
 		Serial.println("connecting..");
 		// send the HTTP PUT request:
@@ -119,9 +118,9 @@ void sendData(String thisData)
 		TxData += "\r\n\r\n";
 
 		myClient.send((String)TxData);
-	}
 
-	lastConnectionTime = millis();
+		lastConnectionTime = millis();
+	}
 }
 
 float getTempC()
