@@ -5,7 +5,7 @@
 #include "WizFi250_udp.h"
 
 
-#define SSID	"Wiznet_Kaizen"
+#define SSID	"WiznetKaizen"
 #define KEY	"123456789"
 #define AUTH	""
 
@@ -20,7 +20,6 @@ IPAddress mask			(255,255,255,0);
 
 IPAddress timeServer	(211,233,84,186);
 //IPAddress timeServer	(129,6,15,28);
-//IPAddress timeServer	(192,168,4,104);
 const int NTP_PACKET_SIZE = 48;
 uint8_t packetBuffer[NTP_PACKET_SIZE];
 
@@ -28,7 +27,8 @@ boolean Wifi_setup = false;
 unsigned long lastSendTime = 0;
 const unsigned long requestInterval = 10 * 1000;
 
-WizFi250		wizfi250;
+
+WizFi250	wizfi250;
 WizFi250_UDP	Udp(timeServer,LOCAL_PORT,REMOTE_PORT);
 
 void sendNTPpacket();
@@ -45,8 +45,14 @@ void setup()
 	wizfi250.sync();
 	wizfi250.setDhcp();
 
-	if( wizfi250.join(SSID,KEY,AUTH) == 0 )
-		Wifi_setup = true;
+	for(int i=0; i<10; i++)
+	{
+		if( wizfi250.join(SSID,KEY,AUTH) == RET_OK )
+		{
+			Wifi_setup = true;
+			break;
+		}
+	}
 }
 
 void loop()

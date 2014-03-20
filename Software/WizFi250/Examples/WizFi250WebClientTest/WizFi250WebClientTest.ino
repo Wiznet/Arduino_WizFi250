@@ -4,7 +4,8 @@
 #include "WizFi250.h"
 #include "WizFi250_tcp_client.h"
 
-#define SSID	"Wiznet_Kaizen"
+
+#define SSID	"WiznetKaizen"
 #define KEY	"123456789"
 #define AUTH	""
 
@@ -21,6 +22,7 @@ WizFi250_TCP_Client	myClient;
 
 boolean Wifi_setup = false;
 
+
 //The setup function is called once at startup of the sketch
 void setup()
 {
@@ -35,8 +37,14 @@ void setup()
 	wizfi250.sync();
 	wizfi250.setDhcp();
 
-	if( wizfi250.join(SSID,KEY,AUTH) == 0 )
-		Wifi_setup = true;
+	for(int i=0; i<10; i++)
+	{
+		if( wizfi250.join(SSID,KEY,AUTH) == RET_OK )
+		{
+			Wifi_setup = true;
+			break;
+		}
+	}
 }
 
 // The loop function is called in an endless loop
@@ -62,7 +70,7 @@ void loop()
 			myClient = WizFi250_TCP_Client(destIP, REMOTE_PORT);
 			retval = myClient.connect();
 
-			if(retval == 1)
+			if(retval == RET_OK)
 			{
 				Serial.println("Connected! ");
 				sprintf((char*)Txbuf,"GET /v2/feeds/827175846.csv HTTP/1.1\r\nHost: api.xively.com\r\nX-ApiKey: EUHFMSwZj8pDdE6jKZgooDt3vlDivDy6srpKgbfE0rgdnZ3D\r\n\r\n");

@@ -70,6 +70,8 @@ prog_char at_command_fwebs_down[]		PROGMEM = "AT+FWEBS=0";
 prog_char at_command_fwebs_up[]			PROGMEM = "AT+FWEBS=1,A";
 prog_char at_command_smgmt[]			PROGMEM = "AT+SMGMT=%c";
 prog_char at_command_ssend[]			PROGMEM = "AT+SSEND=%c,%s,%d,%d";
+prog_char at_command_ssend_data[]		PROGMEM = "";
+prog_char at_command_wleave[]			PROGMEM = "AT+WLEAVE";
 
 PROGMEM const char *at_cmd_table[] =
 {
@@ -85,7 +87,9 @@ PROGMEM const char *at_cmd_table[] =
 		at_command_fwebs_down,				// AT_FWEBS_DOWN
 		at_command_fwebs_up,				// AT_FWEBS_UP
 		at_command_smgmt,					// AT_SMGMT
-		at_command_ssend					// AT_SSEND
+		at_command_ssend,					// AT_SSEND
+		at_command_ssend_data,				// AT_SSEND_DATA
+		at_command_wleave					// AT_WLEAVE
 };
 
 WizFi250 *WizFi250::m_instance;
@@ -526,6 +530,7 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 	case AT_FWEBS_UP:
 	case AT_SCON_TCP_SERVER:
 	case AT_SSEND_DATA:
+	case AT_WLEAVE:
 
 		m_Current_Ptr = 0;
 		retval = GetToken(buf, Token);
@@ -866,6 +871,13 @@ uint8_t WizFi250::defaultWebServerDown ()
 	char	tmpstr[16];
 	uint8_t	nResult = 0;
 
+
+	nResult = wleave();
+	if(nResult != RET_OK)
+	{
+		return nResult;
+	}
+
 	memset(tmpstr, 0, 16);
 	strcpy_P((char *)tmpstr, (char*)pgm_read_word(&(at_cmd_table[AT_FWEBS_DOWN]))); // Necessary casts and dereferencing, just copy.
 	sprintf((char*)cmd, (char*)tmpstr);
@@ -884,6 +896,13 @@ uint8_t WizFi250::defaultWebServerUp ()
 	char	cmd[MAX_CMD_LEN];
 	char	tmpstr[16];
 	uint8_t	nResult = 0;
+
+
+	nResult = wleave();
+	if(nResult != RET_OK)
+	{
+		return nResult;
+	}
 
 	memset(tmpstr, 0, 16);
 	strcpy_P((char *)tmpstr, (char*)pgm_read_word(&(at_cmd_table[AT_FWEBS_UP]))); // Necessary casts and dereferencing, just copy.
@@ -904,6 +923,11 @@ uint8_t	WizFi250::join(const char *ssid, const char *phrase, const char *auth)
 	char	tmpstr[16];
 	uint8_t	nResult = 0;
 
+	nResult = wleave();
+	if(nResult != RET_OK)
+	{
+		return nResult;
+	}
 
 	memset(tmpstr, 0, 16);
 	strcpy_P((char *)tmpstr, (char*)pgm_read_word(&(at_cmd_table[AT_WSET]))); // Necessary casts and dereferencing, just copy.
@@ -936,6 +960,21 @@ uint8_t	WizFi250::join(const char *ssid, const char *phrase, const char *auth)
 	return nResult;
 }
 
+uint8_t WizFi250::wleave()
+{
+	char	cmd[MAX_CMD_LEN];
+	char	tmpstr[16];
+	uint8_t	nResult = 0;
+
+	memset(tmpstr, 0, 16);
+	strcpy_P((char *)tmpstr, (char*)pgm_read_word(&(at_cmd_table[AT_WLEAVE]))); // Necessary casts and dereferencing, just copy.
+	sprintf((char*)cmd, (char*)tmpstr);
+
+
+	nResult = sendATCommand((char*)cmd, AT_WLEAVE, 1);
+
+	return nResult;
+}
 
 uint8_t	WizFi250::printWirelessStatus()
 {

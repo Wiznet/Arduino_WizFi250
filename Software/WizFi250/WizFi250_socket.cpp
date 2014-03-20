@@ -220,7 +220,7 @@ uint16_t WizFi250_Socket::recv (uint8_t *buf, uint16_t size)
 	{
 		return 0;
 	}
-	else if( m_wizfi250->m_Current_ESC_Data_Length == m_wizfi250->m_ESC_Data_Length )
+	else
 	{
 		for(recv_length = 0; recv_length<size; recv_length++)
 		{
