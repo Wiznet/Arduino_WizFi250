@@ -8,7 +8,7 @@
 #define FEEDID		"827175846"
 #define USERAGENT	""
 
-#define SSID	"Wiznet_Kaizen"
+#define SSID	"WiznetKaizen"
 #define KEY	"123456789"
 #define AUTH	""
 
@@ -49,8 +49,14 @@ void setup()
 	wizfi250.sync();
 	wizfi250.setDhcp();
 
-	if( wizfi250.join(SSID,KEY,AUTH) == 0 )
-		Wifi_setup = true;
+	for(int i=0; i<10; i++)		// Try to join 30 times
+        {
+          if( wizfi250.join(SSID,KEY,AUTH) == RET_OK )
+          {
+            Wifi_setup = true;
+            break;
+          }
+        }
 }
 
 // The loop function is called in an endless loop
@@ -96,7 +102,7 @@ void sendData(String thisData)
 	uint8_t content_len[6]={0};
 	String TxData;
 
-	if(myClient.connect() == RET_OK)
+	if(myClient.connect() == RET_OK)  // RET_OK
 	{
 		Serial.println("connecting..");
 		// send the HTTP PUT request:

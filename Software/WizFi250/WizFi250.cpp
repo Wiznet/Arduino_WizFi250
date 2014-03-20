@@ -69,7 +69,7 @@ prog_char at_command_fdns[]				PROGMEM = "AT+FDNS=%s,%d";
 prog_char at_command_fwebs_down[]		PROGMEM = "AT+FWEBS=0";
 prog_char at_command_fwebs_up[]			PROGMEM = "AT+FWEBS=1,A";
 prog_char at_command_smgmt[]			PROGMEM = "AT+SMGMT=%c";
-prog_char at_command_ssend[]			PROGMEM = "AT+SSEND=%c,%s,%d,%d\r";
+prog_char at_command_ssend[]			PROGMEM = "AT+SSEND=%c,%s,%d,%d";
 
 PROGMEM const char *at_cmd_table[] =
 {
@@ -113,6 +113,60 @@ WizFi250::WizFi250()
 	}
 }
 
+
+uint8_t WizFi250::sendATCommand (const String &send_command, uint8_t command_idx, uint8_t cr_lf)
+{
+	char crlf_string[3];
+	char DBG_Buf[32];
+
+	// Send CR, LF
+	if ( cr_lf == 1 )			strcpy(crlf_string, "\r");
+	else if ( cr_lf == 2 )		strcpy(crlf_string, "\n");
+	else if ( cr_lf == 3 )		strcpy(crlf_string, "\r\n");
+
+	while(1)
+	{
+		RcvPacket();
+
+		if(m_Current_CmdState == WizFi250_CmdState_IDLE )
+		{
+			write(send_command);
+			m_lastCommand = command_idx;
+
+			if ( cr_lf == 1 || cr_lf == 2 || cr_lf == 3 )
+			{
+				write((uint8_t*)crlf_string);
+			}
+
+			m_RxIdx = 0;
+
+			m_CmdResult = CMD_SENT;
+			m_Current_CmdState = WizFi250_CmdState_Sent;
+			m_Current_ReplyState = WizFi250_ReplyState_IDLE;
+		}
+		else if(m_Current_CmdState == WizFi250_CmdState_Sent)
+		{
+			if(m_CmdResult == CMD_SUCCEEDED)
+			{
+				m_Current_CmdState = WizFi250_CmdState_IDLE;
+				m_Current_ReplyState = WizFi250_ReplyState_IDLE;
+				return RET_OK;
+			}
+			else if(m_CmdResult == CMD_NOTI)
+			{
+				m_Current_CmdState = WizFi250_CmdState_IDLE;
+				m_Current_ReplyState = WizFi250_ReplyState_IDLE;
+				return RET_NOTI;
+			}
+			else if(m_CmdResult == CMD_FAILED)
+			{
+				m_Current_CmdState = WizFi250_CmdState_IDLE;
+				m_Current_ReplyState = WizFi250_ReplyState_IDLE;
+				return RET_NOK;
+			}
+		}
+	}
+}
 
 uint8_t WizFi250::sendATCommand (const char *send_command, uint8_t command_idx, uint8_t cr_lf)
 {
@@ -248,6 +302,8 @@ void WizFi250::RcvPacket(void)
 
 								if(retval == RET_OK)
 									m_CmdResult = CMD_NOTI;
+								else
+									m_CmdResult = CMD_FAILED;
 							}
 							else
 							{
@@ -267,11 +323,7 @@ void WizFi250::RcvPacket(void)
 								memset(m_ReplyBuf, 0, MAX_SPI_BUFSIZE);
 								m_RxIdx = 0;
 
-								if(retval == CMD_SUCCEEDED)
-									m_CmdResult = CMD_SUCCEEDED;
-								else if(retval == CMD_FAILED)
-									m_CmdResult = CMD_FAILED;
-
+								m_CmdResult = (CMD_STATE)retval;
 								m_Current_ESC_State = WizFi250_ESC_IDLE;
 							}
 						}
@@ -398,14 +450,6 @@ void WizFi250::RcvPacket(void)
 #endif
 		m_ESC_Data_Idx++;
 
-		if(m_ESC_Data_Length > MAX_DATA_BUFSIZE)
-		{
-			if(m_Current_ESC_Data_Length == MAX_DATA_BUFSIZE)
-			{
-				m_IsDataRecv[m_CurrentSockIndex] = true;
-			}
-		}
-
 		if(m_ESC_Data_Idx == m_ESC_Data_Length)
 		{
 #ifdef DEBUG_ENABLE
@@ -481,18 +525,12 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 	case AT_FWEBS_DOWN:
 	case AT_FWEBS_UP:
 	case AT_SCON_TCP_SERVER:
+	case AT_SSEND_DATA:
 
 		m_Current_Ptr = 0;
 		retval = GetToken(buf, Token);
 		while(1)
 		{
-			if(retval == -1)
-			{
-#ifdef DEBUG_ENABLE
-				Serial.println("-1");
-#endif
-				return CMD_FAILED;
-			}
 #ifdef DEBUG_ENABLE
 			//Serial.println((char*)Token);
 #endif
@@ -501,7 +539,7 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 			else if( !strcmp((char const *)Token, "[ERROR]") )
 				return CMD_FAILED;
 			else
-				return CMD_CONTINUE;
+				return CMD_SENT;
 		}
 		break;
 
@@ -524,7 +562,7 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 					return CMD_FAILED;
 				}
 				else
-					return CMD_CONTINUE;		// If
+					return CMD_SENT;		// If
 
 				break;
 			case WizFi250_ReplyState_CONNECT:
@@ -535,6 +573,37 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 
 					return CMD_SUCCEEDED;
 				}
+				break;
+			}
+
+			retval = GetToken(buf, Token);
+		}
+		break;
+	case AT_SSEND:
+		m_Current_Ptr = 0;
+		return CMD_SUCCEEDED;
+		break;
+
+	case AT_SMGMT:
+		m_Current_Ptr = 0;
+		retval = GetToken(buf, Token);
+
+		while(1)
+		{
+			switch(m_Current_ReplyState)
+			{
+			case WizFi250_ReplyState_IDLE:
+				if( !strcmp((char const *)Token, "[DISCONNECT") )
+				{
+					return CMD_SUCCEEDED;
+				}
+				else if( !strcmp((char const *)Token, "[ERROR]") )
+				{
+					return CMD_FAILED;
+				}
+				else
+					return CMD_SENT;		// If
+
 				break;
 			}
 
@@ -560,7 +629,7 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 				else
 				{
 					strcpy((char*)m_peerIPAddr,(char*)Token);
-					return CMD_CONTINUE;
+					return CMD_SENT;
 				}
 				break;
 			}

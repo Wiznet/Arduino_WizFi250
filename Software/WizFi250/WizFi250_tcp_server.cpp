@@ -33,10 +33,10 @@ uint8_t WizFi250_TCP_Server::listen	()
 			m_isListen = true;
 //			m_cid = m_wizfi250->m_cid;
 
-			return 1;
+			return retval;
 		}
-		else if ( retval == RET_NOK )
-			return 0;
+		else
+			return retval;
 	}
 }
 
@@ -61,17 +61,18 @@ uint8_t WizFi250_TCP_Server::stop()
 		strcpy_P((char *)tmpstr, (char*)pgm_read_word(&(at_cmd_table[AT_SMGMT]))); 	// Necessary casts and dereferencing, just copy.
 		sprintf(cmd, tmpstr, m_cid);
 
-		retval = m_wizfi250->sendATCommand((char*)cmd, 1, 50, 100, (char*)"[DISCONNECT",(char*)"");
+		retval = m_wizfi250->sendATCommand((char*)cmd, AT_SMGMT, 1);
 
-		if(retval == RET_OK)
+		if(retval == RET_OK || retval == RET_NOTI)
 		{
 			m_isListen = false;
 			m_cid = 0xff;
 			m_bIsConnected = false;
-			return 1;
+
+			return retval;
 		}
-		else if ( retval == RET_NOK )
-			return 0;
+		else
+			return retval;
 	}
 }
 

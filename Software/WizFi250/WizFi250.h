@@ -34,12 +34,14 @@
 #define RECV_BUF_SIZE			64
 #define MAX_SOCK_CNT			8
 
-enum AT_CMD_LIST	{ AT_WSET=0, AT_WSEC=1, AT_WNET=2, AT_WJOIN=3, AT_WSTAT=4, AT_SCON_TCP_CLIENT=5, AT_SCON_TCP_SERVER=6, AT_SCON_UDP=7, AT_FDNS=8, AT_FWEBS_DOWN=9, AT_FWEBS_UP=10, AT_SMGMT=11, AT_SSEND=12 };
-enum CMD_STATE		{ CMD_FAILED = 0, CMD_SUCCEEDED = 1, CMD_SENT = 2,	CMD_AVAILABLE = 3,	CMD_CONTINUE = 4, CMD_NOTI = 5 };
+enum AT_CMD_LIST	{ AT_WSET=0, AT_WSEC=1, AT_WNET=2, AT_WJOIN=3, AT_WSTAT=4, AT_SCON_TCP_CLIENT=5, AT_SCON_TCP_SERVER=6, AT_SCON_UDP=7, AT_FDNS=8, AT_FWEBS_DOWN=9, AT_FWEBS_UP=10, AT_SMGMT=11, AT_SSEND=12, AT_SSEND_DATA=13 };
+enum CMD_STATE		{ CMD_FAILED = 0, CMD_SUCCEEDED = 1, CMD_SENT = 2,	CMD_AVAILABLE = 3, CMD_NOTI = 4 };
 enum NOTI_LIST		{ NOTI_CONNECT = 0, NOTI_DISCONNECT = 1, NOTI_LEAVE = 2, NOTI_ERROR = 3, NOTI_OK = 4, NOTI_SEND_OK = 5 };
 enum DBG_MSG_LIST	{ SEND_AT_COMMAND = 0, START_RECEVING_DATA_MSG = 1, REPLY_MSG=2, NOTIFY_START_MSG = 3, INVALID_START_MSG = 4,
 					  CID_MSG = 5, PEER_IP_MSG = 6, PEER_PORT_MSG = 7, DATA_LENGTH_MSG = 8, DBG_CONNECT_MSG = 9, DBG_DISASSOCIATE_MSG = 10,
 					  DBG_SOCK_FAIL = 11, DBG_SOCK_INVAL_NOTI = 12 };
+
+enum 				{ RET_OK = 0, RET_NOK = 1, RET_NOTI = 2 };
 
 
 extern PROGMEM const char *at_cmd_table[];
@@ -50,13 +52,6 @@ extern PROGMEM const char *debug_receiving_data_table[];
 class WizFi250 : public WizFi250SpiDrv
 {
 public:
-	enum{ FW_VERSION = 0, HW_VERSION = 1 };
-	enum{ STATION_INTERFACE = 0, AP_INTERFACE = 1 };
-	enum{ WSTAT_INTERFACE = 0, WSTAT_SSID = 1, WSTAT_IP = 2, WSTAT_GATEWAYIP = 3, WSTAT_BSSID = 4, WSTAT_TXPOWER = 5, WSTAT_RSSI = 6 };
-	enum{ WSET_INTERFACE = 0, WSET_SSID = 1, WSET_BSSID = 2, WSET_CHANNEL = 3 };
-	enum{ WSEC_INTERFACE = 0, WSEC_SECURITY_TYPE = 1, WSEC_KEY =2 };
-	enum{ WNET_DHCP_STAT = 0, WNET_IP = 1, WNET_GATEWAY = 2, WNET_MASK = 3};
-	enum{ PROTO_UDP = 0, PROTO_TCP = 1 };
 	enum{ NO_NOTI = 0, DISCONNECT_NOTI = 1,	DISASSOCIATE_NOTI = 2, CONNECT_NOTI = 3, ASSOCIATE_NOTI = 4, SOCKFAILURE_NOTI = 5, INVALID_NOTI = 6	};
 
 
@@ -67,8 +62,9 @@ public:
         return m_instance;
     }
 
+    uint8_t sendATCommand	(const String &send_command, uint8_t command_idx, uint8_t cr_lf);
     uint8_t sendATCommand	(const char *send_command, uint8_t command_idx, uint8_t cr_lf);
-	uint8_t	sendATCommand	(const char *send_command, uint8_t cr_lf, uint32_t check_delay, uint32_t check_count, char* str_find1, char* str_find2 );
+    uint8_t	sendATCommand	(const char *send_command, uint8_t cr_lf, uint32_t check_delay, uint32_t check_count, char* str_find1, char* str_find2 );
 
 	void	ChangeESCState	(uint8_t state);
 	void 	RcvPacket		(void);
@@ -119,7 +115,7 @@ private:
 
 
    uint8_t	m_ESC_Length_Idx;
-   uint8_t	m_ESC_Data_Idx;
+   uint16_t	m_ESC_Data_Idx;
 
    uint16_t	m_Current_Ptr;
 

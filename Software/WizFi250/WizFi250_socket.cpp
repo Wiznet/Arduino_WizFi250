@@ -137,8 +137,8 @@ uint32_t WizFi250_Socket::send (const String &buf)
 	sprintf((char*)temp_ip,"%d.%d.%d.%d", (uint8_t)m_dest_ip[0], (uint8_t)m_dest_ip[1], (uint8_t)m_dest_ip[2], (uint8_t)m_dest_ip[3] );
 	sprintf((char*)cmd, (char*)tmpstr, m_cid, temp_ip, (int)m_dest_port, (int)buf.length());
 
-	m_wizfi250->write((uint8_t*)cmd);
-	m_wizfi250->write(buf);
+	m_wizfi250->sendATCommand((char*)cmd,AT_SSEND,1);
+	m_wizfi250->sendATCommand(buf,AT_SSEND_DATA,0);
 
 	return RET_OK;
 }

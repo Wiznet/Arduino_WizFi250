@@ -36,10 +36,10 @@ uint8_t	WizFi250_UDP::begin	()
 			m_bIsConnected = true;
 			m_cid = m_wizfi250->m_cid;
 
-			return 1;
+			return retval;
 		}
 		else
-			return 0;
+			return retval;
 	}
 }
 

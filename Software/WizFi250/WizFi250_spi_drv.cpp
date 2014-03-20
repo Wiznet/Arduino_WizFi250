@@ -1,6 +1,6 @@
 #include "Debug.h"
 #include "WizFi250_spi_drv.h"
-#include "WizFi250_definitions.h"
+#include "WizFi250.h"
 
 #include <avr/pgmspace.h>
 

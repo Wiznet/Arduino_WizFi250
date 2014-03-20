@@ -28,7 +28,4 @@
 //Maximum number of attempts to establish wifi connection
 #define MAX_ATTEMPT_CONNECTION	10
 
-enum { RET_OK = 0, RET_NOK = 1, RET_NOTI = 2 };
-
-
 #endif /* WIZFI250_DEFINITIONS_H_ */
