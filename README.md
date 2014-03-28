@@ -13,7 +13,7 @@ For using WizFi250-EVB with Arduino, You have to connect 0ohm register to 1 and 
 ![WizFi250-EVB1](https://raw.githubusercontent.com/Wiznet/Arduino_WizFi250/master/WizFi250-EVB1.png "WizFi250-EVB1")
 
 ## Software
-These are driver code of WizFi250 and example code. Driver code of WizFi250 are at [Software\WizFi250\](https://github.com/Wiznet/Arduino_WizFi250/tree/master/Software/WizFi250).
+These are driver code of WizFi250 and example code. Driver code of WizFi250 are at [Software\WizFi250](https://github.com/Wiznet/Arduino_WizFi250/tree/master/Software/WizFi250).
 And we did prepare many example code of WizFi250-EVB for Arduino.
  - WizFi250RCCar
  - WizFi250UdpNtpClient
