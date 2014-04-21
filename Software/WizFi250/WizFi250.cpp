@@ -598,7 +598,7 @@ uint8_t WizFi250::ParseReply(uint8_t *buf, uint8_t command)
 			switch(m_Current_ReplyState)
 			{
 			case WizFi250_ReplyState_IDLE:
-				if( !strcmp((char const *)Token, "[DISCONNECT") )
+				if( !strcmp((char const *)Token, "[DISCONNECT") || !strcmp((char const *)Token, "[OK]"))
 				{
 					return CMD_SUCCEEDED;
 				}

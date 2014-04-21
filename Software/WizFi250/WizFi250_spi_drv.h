@@ -24,10 +24,16 @@
 #define SPI_XOFF	(uint8_t) 0x04
 #define SPI_ERR		(uint8_t) 0x05
 
-#define MAX_SPI_BUFSIZE		64
-#define MAX_DATA_BUFSIZE	64
+#ifdef ARDUINO_MEGA_2560
+	#define MAX_SPI_BUFSIZE		1024
+	#define MAX_DATA_BUFSIZE	1024
+#else if
+	#define MAX_SPI_BUFSIZE		64
+	#define MAX_DATA_BUFSIZE	64
 
-//#define SPI_OVERFLOW_MARGIN		10
+	//#define SPI_OVERFLOW_MARGIN		10
+#endif
+
 
 
 class WizFi250SpiDrv

@@ -121,7 +121,7 @@ void WizFi250_Socket::stop()
 		return;
 
 	sprintf((char*)cmd,"AT+SMGMT=%c", m_cid);
-	m_wizfi250->write((uint8_t*)cmd);
+	m_wizfi250->sendATCommand((char*)cmd, AT_SMGMT,1);
 }
 
 uint32_t WizFi250_Socket::send (const String &buf)

@@ -47,7 +47,7 @@ void WizFi250SpiDrv::begin()
 	pinMode(m_WizFi250_DataReady, INPUT);
 	pinMode(m_WizFi250_CS, OUTPUT);
 
-	SPI.setClockDivider(SPI_CLOCK_DIV16);	// Max Clock Frequency
+	SPI.setClockDivider(SPI_CLOCK_DIV4);	// Max Clock Frequency
 	SPI.begin();
 }
 
@@ -62,9 +62,9 @@ uint8_t WizFi250SpiDrv::wizspi_byte(uint8_t byte, uint8_t issue_cs, uint16_t del
 	uint8_t spi_data;
 
 	if ( issue_cs != 0 )	digitalWrite(m_WizFi250_CS, LOW);
-	if ( delay1 > 0 )		delay(delay1);
+	if ( delay1 > 0 )		delayMicroseconds(delay1 * 10);
 	spi_data = SPI.transfer(byte);
-	if ( delay2 > 0 )		delay(delay2);
+	if ( delay2 > 0 )		delayMicroseconds(delay2 * 10);
 	if ( issue_cs != 0 )	digitalWrite(m_WizFi250_CS, HIGH);
 
 	if ( print == 1 )
