@@ -22,8 +22,7 @@
 #define AUTH	""
 
 #define REMOTE_PORT 80
-#define TOKEN "2815954261-ZZzuafd0ZQ5a1Uflq4kGIbfzFDM7H52GBwmRNKU"    // For Wiznet_Maker
-//#define TOKEN "2777900186-aec0tgvw3EKzmJBlIaJeQ8mIUoYZ4iVHG5Ji2OM"      // For kaizen_test1
+#define TOKEN "Your-Token"
 
 #define LIB_DOMAIN "arduino-tweet.appspot.com"
 
