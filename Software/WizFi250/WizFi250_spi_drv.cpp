@@ -5,16 +5,16 @@
 #include <avr/pgmspace.h>
 
 
-prog_char dbg_start_msg[]						PROGMEM =  "DBG>>>>";
-prog_char dbg_spi_send[]						PROGMEM =  "\r\n===== SPI Send =====";
-prog_char dbg_spi_recv[]						PROGMEM =  "\r\n===== SPI Recv =====";
-prog_char dbg_spi_end[]							PROGMEM =  "\r\n==================\r\n";
-prog_char dbg_error_data_size_too_big[]			PROGMEM =  "Error : send-data-size if too big";
-prog_char dbg_error_rx_buff_overflow[]			PROGMEM =  "Error : m_spi_rx_buffer overflow";
-prog_char dbg_error_not_found_success_string[]	PROGMEM =  "Error : Timeout or Not Found Success String";
-prog_char dbg_need_spi_null[]					PROGMEM =  "Need SPI_NUL";
+const char dbg_start_msg[]							PROGMEM =  "DBG>>>>";
+const char dbg_spi_send[]							PROGMEM =  "\r\n===== SPI Send =====";
+const char dbg_spi_recv[]							PROGMEM =  "\r\n===== SPI Recv =====";
+const char dbg_spi_end[]								PROGMEM =  "\r\n==================\r\n";
+const char dbg_error_data_size_too_big[]			PROGMEM =  "Error : send-data-size if too big";
+const char dbg_error_rx_buff_overflow[]			PROGMEM =  "Error : m_spi_rx_buffer overflow";
+const char dbg_error_not_found_success_string[]	PROGMEM =  "Error : Timeout or Not Found Success String";
+const char dbg_need_spi_null[]						PROGMEM =  "Need SPI_NUL";
 
-PROGMEM const char *debug_str_table[] =
+const char * const debug_str_table[] PROGMEM =
 {
 		dbg_start_msg,
 		dbg_spi_send,

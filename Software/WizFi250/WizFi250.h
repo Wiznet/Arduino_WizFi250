@@ -45,9 +45,9 @@ enum DBG_MSG_LIST	{ SEND_AT_COMMAND = 0, START_RECEVING_DATA_MSG = 1, REPLY_MSG=
 enum 				{ RET_OK = 0, RET_NOK = 1, RET_NOTI = 2 };
 
 
-extern const char *at_cmd_table[];
-extern const char *noti_string_table[];
-extern const char *debug_receiving_data_table[];
+extern const char * const at_cmd_table[];
+extern const char * const noti_string_table[];
+extern const char * const debug_receiving_data_table[];
 
 
 class WizFi250 : public WizFi250SpiDrv

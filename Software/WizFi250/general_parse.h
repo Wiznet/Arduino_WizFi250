@@ -10,7 +10,7 @@
 
 #include <Arduino.h>
 #include <IPAddress.h>
-#include <Serial.h>
+//#include <Serial.h>
 #include <ctype.h>
 
 #define SUCCESS 0

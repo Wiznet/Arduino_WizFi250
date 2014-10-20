@@ -10,87 +10,89 @@
 
 //#define DEBUG_ENABLE
 
-prog_char dbg_send_command_msg[]				PROGMEM = "\r\n<Send AT Command>";
-prog_char dbg_data_recv_start_msg[]				PROGMEM =  "\r\n<Start Receiving Data>";
-prog_char dbg_data_recv_reply_msg[]				PROGMEM =  "\r\n<Receive Reply Message>";
-prog_char dbg_notify_start_msg[]				PROGMEM =  "\r\n<NOTIFY Message was Started>";
-prog_char dbg_invalid_start_msg[]				PROGMEM =  "\r\n<Invalid Start Message>";
-prog_char dbg_cid_msg[]							PROGMEM =  "<CID>\t";
-prog_char dbg_peer_ip_msg[]						PROGMEM =  "<Peer IP>\t";
-prog_char dbg_peer_port_msg[]					PROGMEM =  "<Peer Port>\t";
-prog_char dbg_data_length_msg[]					PROGMEM =  "<Data Length>\t";
-prog_char dbg_connect_msg[]						PROGMEM	=  "<Connect>";
-prog_char dbg_disassociate_msg[]				PROGMEM =  "<Disassociate>";
-prog_char dbg_sock_fail_msg[]					PROGMEM = "Socket Failure";
-prog_char dbg_invalid_noti_msg[]				PROGMEM = "Invalid Notification";
+const char dbg_send_command_msg[]				PROGMEM = "\r\n<Send AT Command>";
+const char dbg_data_recv_start_msg[]			PROGMEM = "\r\n<Start Receiving Data>";
+const char dbg_data_recv_reply_msg[]			PROGMEM = "\r\n<Receive Reply Message>";
+const char dbg_notify_start_msg[]				PROGMEM = "\r\n<NOTIFY Message was Started>";
+const char dbg_invalid_start_msg[]				PROGMEM = "\r\n<Invalid Start Message>";
+const char dbg_cid_msg[]							PROGMEM = "<CID>\t";
+const char dbg_peer_ip_msg[]					PROGMEM = "<Peer IP>\t";
+const char dbg_peer_port_msg[]					PROGMEM = "<Peer Port>\t";
+const char dbg_data_length_msg[]				PROGMEM = "<Data Length>\t";
+const char dbg_connect_msg[]					PROGMEM = "<Connect>";
+const char dbg_disassociate_msg[]				PROGMEM = "<Disassociate>";
+const char dbg_sock_fail_msg[]					PROGMEM = "Socket Failure";
+const char dbg_invalid_noti_msg[]				PROGMEM = "Invalid Notification";
 
-PROGMEM const char *debug_receiving_data_table[] =
+const char * const debug_receiving_data_table[] PROGMEM =
 {
-		dbg_send_command_msg,					// SEND_AT_COMMAND
+		dbg_send_command_msg,				// SEND_AT_COMMAND
 		dbg_data_recv_start_msg,				// START_RECEVING_DATA_MSG
 		dbg_data_recv_reply_msg,				// REPLY_MSG
-		dbg_notify_start_msg,					// NOTIFY_START_MSG
-		dbg_invalid_start_msg,					// INVALID_START_MSG
+		dbg_notify_start_msg,				// NOTIFY_START_MSG
+		dbg_invalid_start_msg,				// INVALID_START_MSG
 		dbg_cid_msg,							// CID_MSG
 		dbg_peer_ip_msg,						// PEER_IP_MSG
-		dbg_peer_port_msg,						// PEER_PORT_MSG
+		dbg_peer_port_msg,					// PEER_PORT_MSG
 		dbg_data_length_msg,					// DATA_LENGTH_MSG
 		dbg_connect_msg,						// DBG_CONNECT_MSG
-		dbg_disassociate_msg,					// DBG_DISASSOCIATE_MSG
-		dbg_sock_fail_msg,						// DBG_SOCK_FAIL
+		dbg_disassociate_msg,				// DBG_DISASSOCIATE_MSG
+		dbg_sock_fail_msg,					// DBG_SOCK_FAIL
 		dbg_invalid_noti_msg					// DBG_SOCK_INVAL_NOTI
 };
 
-prog_char connnct_noti_msg[] 		PROGMEM = "[CONNECT";
-prog_char Disconn_noti_msg[] 		PROGMEM = "[DISCONNECT";
-prog_char Disassociate_noti_msg[] 	PROGMEM = "[Link-Down";
-prog_char Error_noti_msg[]			PROGMEM = "[ERROR";
-prog_char Ok_noti_msg[]				PROGMEM = "[OK]";
-prog_char Send_Ok_noti_msg[]		PROGMEM = "[%c";
-PROGMEM const char *noti_string_table[] =
+const char connnct_noti_msg[] 		PROGMEM = "[CONNECT";
+const char Disconn_noti_msg[] 		PROGMEM = "[DISCONNECT";
+const char Disassociate_noti_msg[] PROGMEM = "[Link-Down";
+const char Error_noti_msg[]			PROGMEM = "[ERROR";
+const char Ok_noti_msg[]				PROGMEM = "[OK]";
+const char Send_Ok_noti_msg[]		PROGMEM = "[%c";
+
+const char * const noti_string_table[] PROGMEM =
 {
 		connnct_noti_msg,						// NOTI_CONNECT
 		Disconn_noti_msg,						// NOTI_DISCONNECT
-		Disassociate_noti_msg,					// NOTI_LEAVE
-		Error_noti_msg,							// NOTI_ERROR
+		Disassociate_noti_msg,				// NOTI_LEAVE
+		Error_noti_msg,						// NOTI_ERROR
 		Ok_noti_msg,							// NOTI_OK
 		Send_Ok_noti_msg						// NOTI_SEND_OK
 };
 
-prog_char at_command_wset[]				PROGMEM = "AT+WSET=0,%s";
-prog_char at_command_wsec[]				PROGMEM	= "AT+WSEC=0,%s,%s";
-prog_char at_command_wnet[]				PROGMEM = "AT+WNET=1";
-prog_char at_command_wjoin[]			PROGMEM = "AT+WJOIN";
-prog_char at_command_wstat[]			PROGMEM = "AT+WSTAT";
-prog_char at_command_scon_tcp_client[]	PROGMEM = "AT+SCON=O,TCN,%s,%d,,%d";
-prog_char at_command_scon_tcp_server[]	PROGMEM = "AT+SCON=O,TSN,,,%d,%d";
-prog_char at_command_scon_udp[]			PROGMEM = "AT+SCON=O,UCN,%s,%d,%d,%d";
-prog_char at_command_fdns[]				PROGMEM = "AT+FDNS=%s,%d";
-prog_char at_command_fwebs_down[]		PROGMEM = "AT+FWEBS=0";
-prog_char at_command_fwebs_up[]			PROGMEM = "AT+FWEBS=1,A";
-prog_char at_command_smgmt[]			PROGMEM = "AT+SMGMT=%c";
-prog_char at_command_ssend[]			PROGMEM = "AT+SSEND=%c,%s,%d,%d";
-prog_char at_command_ssend_data[]		PROGMEM = "";
-prog_char at_command_wleave[]			PROGMEM = "AT+WLEAVE";
+const char at_command_wset[]				PROGMEM = "AT+WSET=0,%s";
+const char at_command_wsec[]				PROGMEM = "AT+WSEC=0,%s,%s";
+const char at_command_wnet[]				PROGMEM = "AT+WNET=1";
+const char at_command_wjoin[]				PROGMEM = "AT+WJOIN";
+const char at_command_wstat[]				PROGMEM = "AT+WSTAT";
+const char at_command_scon_tcp_client[]	PROGMEM = "AT+SCON=O,TCN,%s,%d,,%d";
+const char at_command_scon_tcp_server[]	PROGMEM = "AT+SCON=O,TSN,,,%d,%d";
+const char at_command_scon_udp[]			PROGMEM = "AT+SCON=O,UCN,%s,%d,%d,%d";
+const char at_command_fdns[]				PROGMEM = "AT+FDNS=%s,%d";
+const char at_command_fwebs_down[]			PROGMEM = "AT+FWEBS=0";
+const char at_command_fwebs_up[]			PROGMEM = "AT+FWEBS=1,A";
+const char at_command_smgmt[]				PROGMEM = "AT+SMGMT=%c";
+const char at_command_ssend[]				PROGMEM = "AT+SSEND=%c,%s,%d,%d";
+const char at_command_ssend_data[]			PROGMEM = "";
+const char at_command_wleave[]				PROGMEM = "AT+WLEAVE";
 
-PROGMEM const char *at_cmd_table[] =
+const char * const at_cmd_table[] PROGMEM =
 {
 		at_command_wset,					// AT_WSET
 		at_command_wsec,					// AT_WSEC
 		at_command_wnet,					// AT_WNET
 		at_command_wjoin,					// AT_WJOIN
 		at_command_wstat,					// AT_WSTAT
-		at_command_scon_tcp_client,			// AT_SCON_TCP_CLIENT
-		at_command_scon_tcp_server,			// AT_SCON_TCP_SERVER
+		at_command_scon_tcp_client,		// AT_SCON_TCP_CLIENT
+		at_command_scon_tcp_server,		// AT_SCON_TCP_SERVER
 		at_command_scon_udp,				// AT_SCON_UDP
 		at_command_fdns,					// AT_FDNS
-		at_command_fwebs_down,				// AT_FWEBS_DOWN
+		at_command_fwebs_down,			// AT_FWEBS_DOWN
 		at_command_fwebs_up,				// AT_FWEBS_UP
 		at_command_smgmt,					// AT_SMGMT
 		at_command_ssend,					// AT_SSEND
-		at_command_ssend_data,				// AT_SSEND_DATA
+		at_command_ssend_data,			// AT_SSEND_DATA
 		at_command_wleave					// AT_WLEAVE
 };
+
 
 WizFi250 *WizFi250::m_instance;
 

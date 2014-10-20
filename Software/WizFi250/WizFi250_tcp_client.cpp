@@ -12,10 +12,10 @@
 enum{ DBG_CONN = 0, DBG_DISCON = 1 };
 
 
-prog_char dbg_tcp_client_connect_msg[] PROGMEM = "\r\nCID[%d] Connected";  	 // "String 0" etc are strings to store - change to suit.
-prog_char dbg_tcp_client_disconn_msg[] PROGMEM = "\r\nCID[%d] Disconnect";
+const char dbg_tcp_client_connect_msg[] PROGMEM = "\r\nCID[%d] Connected";  	 // "String 0" etc are strings to store - change to suit.
+const char dbg_tcp_client_disconn_msg[] PROGMEM = "\r\nCID[%d] Disconnect";
 
-PROGMEM const char *tcp_client_dbg_msg_table[] =
+const char * const tcp_client_dbg_msg_table[] PROGMEM =
 {
 		dbg_tcp_client_connect_msg,				// DBG_CONN
 		dbg_tcp_client_disconn_msg				// DBG_DISCON
